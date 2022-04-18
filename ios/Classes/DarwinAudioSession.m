@@ -277,7 +277,10 @@ static NSHashTable<DarwinAudioSession *> *sessions = nil;
 - (NSMutableArray *)encodePortList:(NSArray<AVAudioSessionPortDescription *> *)ports {
     NSMutableArray *array = [NSMutableArray new];
     for (int i = 0; i < ports.count; i++) {
-        [array addObject:[self encodePort:ports[i]]];
+        NSDictionary *dict = [self encodePort:ports[i]];
+        if (dict != nil) {
+            [array addObject:dict];
+        }
     }
     return array;
 }
@@ -286,6 +289,9 @@ static NSHashTable<DarwinAudioSession *> *sessions = nil;
     BOOL hasHardwareVoiceCallProcessing = NO;
     if (@available(iOS 10.0, *)) {
         hasHardwareVoiceCallProcessing = port.hasHardwareVoiceCallProcessing;
+    }
+    if ([self encodePortType:port.portType] == nil) {
+        return nil;
     }
     return @{
         @"portName": port.portName,
